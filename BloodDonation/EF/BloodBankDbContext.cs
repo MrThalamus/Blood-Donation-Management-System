@@ -29,17 +29,15 @@ public partial class BloodBankDbContext : DbContext
         {
             entity.ToTable("Donation");
 
-            entity.Property(e => e.DonationId)
-                .ValueGeneratedNever()
-                .HasColumnName("DonationID");
+            entity.Property(e => e.DonationId).HasColumnName("DonationID");
             entity.Property(e => e.CampName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.DonerId).HasColumnName("DonerID");
+            entity.Property(e => e.DonorId).HasColumnName("DonorID");
             entity.Property(e => e.VolumeMl).HasColumnName("VolumeML");
 
-            entity.HasOne(d => d.Doner).WithMany(p => p.Donations)
-                .HasForeignKey(d => d.DonerId)
+            entity.HasOne(d => d.Donor).WithMany(p => p.Donations)
+                .HasForeignKey(d => d.DonorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Donation_Donor");
         });
@@ -48,9 +46,7 @@ public partial class BloodBankDbContext : DbContext
         {
             entity.ToTable("Donor");
 
-            entity.Property(e => e.DonorId)
-                .ValueGeneratedNever()
-                .HasColumnName("DonorID");
+            entity.Property(e => e.DonorId).HasColumnName("DonorID");
             entity.Property(e => e.BloodGroup)
                 .HasMaxLength(10)
                 .IsFixedLength();

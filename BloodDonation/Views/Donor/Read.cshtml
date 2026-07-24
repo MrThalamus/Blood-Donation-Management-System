@@ -1,0 +1,38 @@
+﻿@model List<BloodDonation.EF.Tables.Donor>
+@{
+    ViewBag.Title = "This is the Donor List";
+}
+<h2>@ViewBag.Title</h2>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Donor ID</th>
+            <th>Full Name</th>
+            <th>Blood Group</th>
+            <th>Contact Number</th>
+            <th>City</th>
+            <th>Last Donation Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var donor in Model)
+        {
+            <tr>
+                <td>@donor.DonorId</td>
+                <td>@donor.FullName</td>
+                <td>@donor.BloodGroup</td>
+                <td>@donor.ContactNo</td>
+                <td>@donor.City</td>
+                <td>@donor.LastDonationDate.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <td>
+                        <a href="/Donor/Edit/@donor.DonorId">Edit</a>
+                        <a href="/Donor/Delete/@donor.DonorId">Delete</a>
+                    </td>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

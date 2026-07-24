@@ -7,7 +7,7 @@ public partial class Donation
 {
     public int DonationId { get; set; }
 
-    public int DonerId { get; set; }
+    public int DonorId { get; set; }
 
     public DateOnly DonationDate { get; set; }
 
@@ -15,5 +15,5 @@ public partial class Donation
 
     public string CampName { get; set; } = null!;
 
-    public virtual Donor Doner { get; set; } = null!;
+    public virtual Donor Donor { get; set; } = null!;
 }
