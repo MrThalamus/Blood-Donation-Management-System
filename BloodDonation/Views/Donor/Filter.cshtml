@@ -1,0 +1,56 @@
+﻿@model List<BloodDonation.EF.Tables.Donor>
+@{
+    ViewBag.Title = "Filter Donors by Blood Group";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form method="get">
+
+    <label>Blood Group:</label>
+
+    <select name="bloodGroup">
+        <option value="">--Select Blood Group--</option>
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+    </select>
+
+    <button type="submit">Search</button>
+
+</form>
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Donor ID</th>
+            <th>Full Name</th>
+            <th>Blood Group</th>
+            <th>Contact Number</th>
+            <th>City</th>
+            <th>Last Donation Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var donor in Model)
+        {
+            <tr>
+                <td>@donor.DonorId</td>
+                <td>@donor.FullName</td>
+                <td>@donor.BloodGroup</td>
+                <td>@donor.ContactNo</td>
+                <td>@donor.City</td>
+                <td>@donor.LastDonationDate.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a href="/Donor/Edit/@donor.DonorId">Edit</a>
+                    <a href="/Donor/Delete/@donor.DonorId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

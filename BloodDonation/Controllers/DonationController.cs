@@ -105,5 +105,13 @@ namespace BloodDonation.Controllers
             dc.SaveChanges();
             return RedirectToAction("Read");
         }
+        //==================================
+        [HttpGet]
+        public IActionResult TotalBloodCollected()
+        {
+            int totalVolume = dc.Donations.Sum(d => d.VolumeMl);
+
+            return View(totalVolume);
+        }
     }
 }

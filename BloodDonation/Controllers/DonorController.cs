@@ -2,6 +2,7 @@
 using BloodDonation.EF.Tables;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using BloodDonation.Models;
 
 namespace BloodDonation.Controllers
 {
@@ -115,6 +116,64 @@ namespace BloodDonation.Controllers
                 dc.SaveChanges();
                 return RedirectToAction("Read");
             }
+        }
+        //==================================================================
+        [HttpGet]
+        public IActionResult Filter(string bloodGroup)
+        {
+            
+            List<Donor> donors;
+
+            if (string.IsNullOrEmpty(bloodGroup))
+            {
+                donors = dc.Donors.ToList();
+            }
+            else
+            {
+                donors = dc.Donors
+                           .Where(d => d.BloodGroup == bloodGroup)
+                           .ToList();
+            }
+
+            return View(donors);
+        }
+        [HttpPost]
+        public IActionResult Filter(string bloodGroup, string city)
+        {
+            var donors = dc.Donors.ToList();
+
+            if (!string.IsNullOrEmpty(bloodGroup))
+            {
+                donors = dc.Donors
+                           .Where(d => d.BloodGroup == bloodGroup)
+                           .ToList();
+            }
+
+            return View(donors);
+        }
+
+        [HttpGet]
+        public IActionResult RecentDonors()
+        {
+            var donors = dc.Donors
+                           .OrderByDescending(d => d.LastDonationDate)
+                           .ToList();
+
+            return View(donors);
+        }
+
+        public IActionResult DonationCount()
+        {
+            var result = dc.Donors
+               .Select(d => new DonorDonationCountVM
+               {
+                   DonorId = d.DonorId,
+                   FullName = d.FullName,
+                   TotalDonations = d.Donations.Count()
+               })
+               .ToList();
+
+            return View(result);
         }
     }
 }
