@@ -1,0 +1,36 @@
+﻿@model BloodDonation.EF.Tables.Donation
+
+@{
+    ViewBag.Title = "Delete Donation";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<p>Are you sure you want to delete the following donation?</p>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <tr>
+        <th>Donation ID</th>
+        <th>Donor ID</th>
+        <th>Donation Date</th>
+        <th>Volume (mL)</th>
+        <th>Camp Name</th>
+    </tr>
+    <tr>
+        <td>@Model.DonationId</td>
+        <td>@Model.DonorId</td>
+        <td>@Model.DonationDate.ToString("yyyy-MM-dd")</td>
+        <td>@Model.VolumeMl</td>
+        <td>@Model.CampName</td>
+    </tr>
+</table>
+
+<br />
+
+<form method="post">
+    <input type="hidden" name="DonorId" value="@Model.DonorId" />
+
+    <button type="submit">Delete</button>
+
+    <a href="/Donor/Read">Cancel</a>
+</form>

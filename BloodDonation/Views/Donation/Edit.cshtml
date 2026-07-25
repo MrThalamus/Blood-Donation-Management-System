@@ -1,0 +1,23 @@
+﻿@model BloodDonation.EF.Tables.Donation
+@{
+    ViewBag.Title = "Edit Donation";
+}
+<h2>@ViewBag.Title</h2>
+
+<form method="post">
+    <input type="hidden" name="DonationId" value="@Model.DonationId" />
+
+    <label>Donor ID:</label>
+    <input type="text" name="DonorId" value="@Model.DonorId" />
+    <br />
+    <label>Donation Date:</label>
+    <input type="date" name="DonationDate" value="@Model.DonationDate.ToString("yyyy-MM-dd")" />
+    <br />
+    <label>Volume (mL):</label>
+    <input type="text" name="VolumeMl" value="@Model.VolumeMl" />
+    <br />
+    <label>Camp Name:</label>
+    <input type="text" name="CampName" value="@Model.CampName" />
+    
+    <button type="submit">Save</button>
+</form>

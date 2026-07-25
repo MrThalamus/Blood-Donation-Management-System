@@ -1,0 +1,32 @@
+﻿@model BloodDonation.EF.Tables.Donation
+@{
+    ViewBag.Title = "Create Donation";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form method="post">
+
+    <label>Donor ID:</label>
+    <select name="DonorId">
+        @foreach (var donor in ViewBag.Donors)
+        {
+            <option value="@donor.DonorId">
+                @donor.DonorId
+            </option>
+        }
+    </select>
+    <br />
+    <label>Donation Date:</label>
+    <input type="date" name="DonationDate" value="@Model.DonationDate.ToString("yyyy-MM-dd")" />
+    <br />
+    <label>Volume (mL):</label>
+    <input type="text" name="VolumeMl" value="@Model.VolumeMl" />
+    <br />
+    <label>Camp Name:</label>
+    <input type="text" name="CampName" value="@Model.CampName" />
+    <br />
+    
+    <button type="submit">Create</button>
+
+</form>
