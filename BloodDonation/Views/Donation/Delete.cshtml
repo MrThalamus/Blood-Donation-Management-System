@@ -4,33 +4,79 @@
     ViewBag.Title = "Delete Donation";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container mt-5">
 
-<p>Are you sure you want to delete the following donation?</p>
+    <div class="card border-danger shadow">
 
-<table border="1" cellpadding="8" cellspacing="0">
-    <tr>
-        <th>Donation ID</th>
-        <th>Donor ID</th>
-        <th>Donation Date</th>
-        <th>Volume (mL)</th>
-        <th>Camp Name</th>
-    </tr>
-    <tr>
-        <td>@Model.DonationId</td>
-        <td>@Model.DonorId</td>
-        <td>@Model.DonationDate.ToString("yyyy-MM-dd")</td>
-        <td>@Model.VolumeMl</td>
-        <td>@Model.CampName</td>
-    </tr>
-</table>
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">Delete Donation</h3>
+        </div>
 
-<br />
+        <div class="card-body">
 
-<form method="post">
-    <input type="hidden" name="DonorId" value="@Model.DonorId" />
+            <div class="alert alert-warning">
 
-    <button type="submit">Delete</button>
+                <strong>Warning!</strong>
 
-    <a href="/Donor/Read">Cancel</a>
-</form>
+                This action cannot be undone.
+
+                Are you sure you want to delete this donation?
+
+            </div>
+
+            <table class="table table-bordered table-hover">
+
+                <tr>
+                    <th width="30%">Donation ID</th>
+                    <td>@Model.DonationId</td>
+                </tr>
+
+                <tr>
+                    <th>Donor ID</th>
+                    <td>@Model.DonorId</td>
+                </tr>
+
+                <tr>
+                    <th>Donation Date</th>
+                    <td>@Model.DonationDate.ToString("yyyy-MM-dd")</td>
+                </tr>
+
+                <tr>
+                    <th>Volume (mL)</th>
+                    <td>@Model.VolumeMl</td>
+                </tr>
+
+                <tr>
+                    <th>Camp Name</th>
+                    <td>@Model.CampName</td>
+                </tr>
+
+            </table>
+
+            <form method="post">
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.DonationId" />
+
+                <button type="submit"
+                        class="btn btn-danger">
+
+                    Delete
+
+                </button>
+
+                <a href="/Donation/Read"
+                   class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,28 +1,81 @@
 ﻿@model List<BloodDonation.Models.DonorDonationCountVM>
 
 @{
-    ViewBag.Title = "Donor Donation Count";
+    ViewBag.Title = "Donor Donation Statistics";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container mt-4">
 
-<table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Donor ID</th>
-            <th>Full Name</th>
-            <th>Total Donations</th>
-        </tr>
-    </thead>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <tbody>
-        @foreach (var donor in Model)
-        {
-            <tr>
-                <td>@donor.DonorId</td>
-                <td>@donor.FullName</td>
-                <td>@donor.TotalDonations</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        <h2 class="text-danger">
+            Donor Donation Statistics
+        </h2>
+
+        <a href="/Donor/Read" class="btn btn-secondary">
+            Back to Donors
+        </a>
+
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Donation Summary by Donor</h4>
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-bordered table-hover table-striped align-middle">
+
+                <thead class="table-danger">
+
+                    <tr>
+                        <th>Donor ID</th>
+                        <th>Full Name</th>
+                        <th class="text-center">Total Donations</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">
+                                No donor records found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var donor in Model)
+                        {
+                            <tr>
+
+                                <td>@donor.DonorId</td>
+
+                                <td>@donor.FullName</td>
+
+                                <td class="text-center">
+
+                                    <span class="badge bg-success fs-6">
+                                        @donor.TotalDonations
+                                    </span>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

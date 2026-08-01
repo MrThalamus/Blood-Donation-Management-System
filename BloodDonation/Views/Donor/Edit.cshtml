@@ -1,26 +1,140 @@
 ﻿@model BloodDonation.EF.Tables.Donor
+
 @{
     ViewBag.Title = "Edit Donor";
 }
-<h2>@ViewBag.Title</h2>
 
-<form method="post">
-    <input type="hidden" name="DonorId" value="@Model.DonorId" />
+<div class="container mt-5">
 
-    <label>Full Name:</label>
-    <input type="text" name="FullName" value="@Model.FullName" />
-    <br />
-    <label>Blood Group:</label>
-    <input type="text" name="BloodGroup" value="@Model.BloodGroup" />
-    <br />
-    <label>Contact Number:</label>
-    <input type="text" name="ContactNo" value="@Model.ContactNo" />
-    <br />
-    <label>City:</label>
-    <input type="text" name="City" value="@Model.City" />
-    <br />
-    <label>Last Donation Date:</label>
-    <input type="date" name="LastDonationDate" value="@Model.LastDonationDate.ToString("yyyy-MM-dd")" />
-    <br />
-    <button type="submit">Save</button>
-</form>
+    <div class="card shadow-lg">
+
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Edit Donor</h3>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <input type="hidden"
+                       name="DonorId"
+                       value="@Model.DonorId" />
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Full Name
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           name="FullName"
+                           value="@Model.FullName"
+                           placeholder="Enter Full Name" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("FullName")
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Blood Group
+                    </label>
+
+                    <select name="BloodGroup" class="form-select">
+
+                        <option value="A+" selected="@(Model.BloodGroup == "A+" ? "selected" : null)">A+</option>
+                        <option value="A-" selected="@(Model.BloodGroup == "A-" ? "selected" : null)">A-</option>
+                        <option value="B+" selected="@(Model.BloodGroup == "B+" ? "selected" : null)">B+</option>
+                        <option value="B-" selected="@(Model.BloodGroup == "B-" ? "selected" : null)">B-</option>
+                        <option value="AB+" selected="@(Model.BloodGroup == "AB+" ? "selected" : null)">AB+</option>
+                        <option value="AB-" selected="@(Model.BloodGroup == "AB-" ? "selected" : null)">AB-</option>
+                        <option value="O+" selected="@(Model.BloodGroup == "O+" ? "selected" : null)">O+</option>
+                        <option value="O-" selected="@(Model.BloodGroup == "O-" ? "selected" : null)">O-</option>
+
+                    </select>
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("BloodGroup")
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Contact Number
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           name="ContactNo"
+                           value="@Model.ContactNo"
+                           placeholder="01XXXXXXXXX" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("ContactNo")
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        City
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           name="City"
+                           value="@Model.City"
+                           placeholder="Enter City" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("City")
+                    </span>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-bold">
+                        Last Donation Date
+                    </label>
+
+                    <input type="date"
+                           class="form-control"
+                           name="LastDonationDate"
+                           value="@Model.LastDonationDate.ToString("yyyy-MM-dd")" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("LastDonationDate")
+                    </span>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Save Changes
+                </button>
+
+                <a href="/Donor/Read" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

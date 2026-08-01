@@ -22,7 +22,9 @@ public partial class Donor
         ErrorMessage = "City name cannot exceed 50 characters.")]
     public string City { get; set; } = null!;
 
-    public DateOnly LastDonationDate { get; set; }
+    public DateOnly LastDonationDate { get; set; } // Navigation property for the related donations
 
+    // One-to-many relationship: A donor can have multiple donations
     public virtual ICollection<Donation> Donations { get; set; } = new List<Donation>();
+
 }

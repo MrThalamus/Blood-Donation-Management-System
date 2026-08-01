@@ -1,36 +1,101 @@
 ﻿@model List<BloodDonation.EF.Tables.Donor>
-@{
-    ViewBag.Title = "This is the Donor List";
-}
-<h2>@ViewBag.Title</h2>
 
-<table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Donor ID</th>
-            <th>Full Name</th>
-            <th>Blood Group</th>
-            <th>Contact Number</th>
-            <th>City</th>
-            <th>Last Donation Date</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var donor in Model)
-        {
-            <tr>
-                <td>@donor.DonorId</td>
-                <td>@donor.FullName</td>
-                <td>@donor.BloodGroup</td>
-                <td>@donor.ContactNo</td>
-                <td>@donor.City</td>
-                <td>@donor.LastDonationDate.ToString("yyyy-MM-dd")</td>
-                <td>
-                    <a href="/Donor/Edit/@donor.DonorId">Edit</a>
-                    <a href="/Donor/Delete/@donor.DonorId">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@{
+    ViewBag.Title = "Donor Management";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="text-danger">
+            Donor Management
+        </h2>
+
+        <a href="/Donor/Create" class="btn btn-success">
+            + Register New Donor
+        </a>
+
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-body">
+
+            <table class="table table-bordered table-hover table-striped align-middle">
+
+                <thead class="table-danger">
+
+                    <tr>
+                        <th>Donor ID</th>
+                        <th>Full Name</th>
+                        <th>Blood Group</th>
+                        <th>Contact Number</th>
+                        <th>City</th>
+                        <th>Last Donation Date</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                No donors found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var donor in Model)
+                        {
+                            <tr>
+
+                                <td>@donor.DonorId</td>
+
+                                <td>@donor.FullName</td>
+
+                                <td>
+                                    <span class="badge bg-danger">
+                                        @donor.BloodGroup
+                                    </span>
+                                </td>
+
+                                <td>@donor.ContactNo</td>
+
+                                <td>@donor.City</td>
+
+                                <td>
+                                    @donor.LastDonationDate.ToString("dd MMM yyyy")
+                                </td>
+
+                                <td class="text-center">
+
+                                    <a href="/Donor/Edit/@donor.DonorId"
+                                       class="btn btn-primary btn-sm">
+                                        Edit
+                                    </a>
+
+                                    <a href="/Donor/Delete/@donor.DonorId"
+                                       class="btn btn-danger btn-sm">
+                                        Delete
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

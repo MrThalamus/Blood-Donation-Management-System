@@ -1,23 +1,116 @@
 ﻿@model BloodDonation.EF.Tables.Donation
+
 @{
     ViewBag.Title = "Edit Donation";
 }
-<h2>@ViewBag.Title</h2>
 
-<form method="post">
-    <input type="hidden" name="DonationId" value="@Model.DonationId" />
+<div class="container mt-5">
 
-    <label>Donor ID:</label>
-    <input type="text" name="DonorId" value="@Model.DonorId" />
-    <br />
-    <label>Donation Date:</label>
-    <input type="date" name="DonationDate" value="@Model.DonationDate.ToString("yyyy-MM-dd")" />
-    <br />
-    <label>Volume (mL):</label>
-    <input type="text" name="VolumeMl" value="@Model.VolumeMl" />
-    <br />
-    <label>Camp Name:</label>
-    <input type="text" name="CampName" value="@Model.CampName" />
-    
-    <button type="submit">Save</button>
-</form>
+    <div class="card shadow-lg">
+
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Edit Donation</h3>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <input type="hidden"
+                       name="DonationId"
+                       value="@Model.DonationId" />
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Donor ID
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           name="DonorId"
+                           value="@Model.DonorId" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("DonorId")
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Donation Date
+                    </label>
+
+                    <input type="date"
+                           class="form-control"
+                           name="DonationDate"
+                           value="@Model.DonationDate.ToString("yyyy-MM-dd")" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("DonationDate")
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Volume (mL)
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           name="VolumeMl"
+                           min="250"
+                           max="500"
+                           value="@Model.VolumeMl" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("VolumeMl")
+                    </span>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-bold">
+                        Camp Name
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           name="CampName"
+                           maxlength="50"
+                           value="@Model.CampName" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("CampName")
+                    </span>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Save Changes
+                </button>
+
+                <a href="/Donation/Read"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

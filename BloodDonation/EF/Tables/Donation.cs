@@ -24,5 +24,5 @@ public partial class Donation
     public string CampName { get; set; } = null!;
 
     [ValidateNever]
-    public virtual Donor Donor { get; set; } = null!;
+    public virtual Donor Donor { get; set; } = null!; // Navigation property to the Donor entity
 }

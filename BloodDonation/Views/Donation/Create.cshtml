@@ -1,32 +1,124 @@
 ﻿@model BloodDonation.EF.Tables.Donation
+
 @{
     ViewBag.Title = "Create Donation";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container mt-5">
 
-<form method="post">
+    <div class="card shadow-lg">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">Create New Donation</h3>
+        </div>
 
-    <label>Donor ID:</label>
-    <select name="DonorId">
-        @foreach (var donor in ViewBag.Donors)
-        {
-            <option value="@donor.DonorId">
-                @donor.DonorId
-            </option>
-        }
-    </select>
-    <br />
-    <label>Donation Date:</label>
-    <input type="date" name="DonationDate" value="@Model.DonationDate.ToString("yyyy-MM-dd")" />
-    <br />
-    <label>Volume (mL):</label>
-    <input type="text" name="VolumeMl" value="@Model.VolumeMl" />
-    <br />
-    <label>Camp Name:</label>
-    <input type="text" name="CampName" value="@Model.CampName" />
-    <br />
-    
-    <button type="submit">Create</button>
+        <div class="card-body">
 
-</form>
+            <form method="post">
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        Donor ID
+                    </label>
+
+                    <select name="DonorId" class="form-select">
+
+                        @foreach (var donor in ViewBag.Donors)
+                        {
+                            <option value="@donor.DonorId">
+                                @donor.DonorId
+                            </option>
+                        }
+
+                    </select>
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("DonorId")
+                    </span>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Donation Date
+                    </label>
+
+                    <input type="date"
+                           class="form-control"
+                           name="DonationDate"
+                           value="@Model.DonationDate.ToString("yyyy-MM-dd")" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("DonationDate")
+                    </span>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Volume (mL)
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           name="VolumeMl"
+                           min="250"
+                           max="500"
+                           placeholder="250 - 500"
+                           value="@Model.VolumeMl" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("VolumeMl")
+                    </span>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Camp Name
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           name="CampName"
+                           maxlength="50"
+                           placeholder="Enter Camp Name"
+                           value="@Model.CampName" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("CampName")
+                    </span>
+
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit" class="btn btn-success">
+                        Save Donation
+                    </button>
+
+                    <a href="/Donation/Read" class="btn btn-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

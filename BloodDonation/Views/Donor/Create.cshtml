@@ -1,27 +1,115 @@
 ﻿@model BloodDonation.EF.Tables.Donor
+
 @{
     ViewBag.Title = "Create Donor";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container mt-5">
 
-<form method="post">
-   
-    <label>Full Name:</label>
-    <input type="text" name="FullName" value="@Model.FullName" />
-    <br />
-    <label>Blood Group:</label>
-    <input type="text" name="BloodGroup" value="@Model.BloodGroup" />
-    <br />
-    <label>Contact Number:</label>
-    <input type="text" name="ContactNo" value="@Model.ContactNo" />
-    <br />
-    <label>City:</label>
-    <input type="text" name="City" value="@Model.City" />
-    <br />
-    <label>Last Donation Date:</label>
-    <input type="date" name="LastDonationDate" value="@Model.LastDonationDate" />
-    <br />
-    <button type="submit">Create</button>
+    <div class="card shadow-lg">
 
-</form>
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">Create New Donor</h3>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Full Name</label>
+
+                    <input type="text"
+                           class="form-control"
+                           name="FullName"
+                           placeholder="Enter Full Name"
+                           value="@Model.FullName" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("FullName")
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Blood Group</label>
+
+                    <select name="BloodGroup" class="form-select">
+                        <option value="">-- Select Blood Group --</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("BloodGroup")
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Contact Number</label>
+
+                    <input type="text"
+                           class="form-control"
+                           name="ContactNo"
+                           placeholder="01XXXXXXXXX"
+                           value="@Model.ContactNo" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("ContactNo")
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">City</label>
+
+                    <input type="text"
+                           class="form-control"
+                           name="City"
+                           placeholder="Enter City"
+                           value="@Model.City" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("City")
+                    </span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Last Donation Date</label>
+
+                    <input type="date"
+                           class="form-control"
+                           name="LastDonationDate"
+                           value="@Model.LastDonationDate.ToString("yyyy-MM-dd")" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("LastDonationDate")
+                    </span>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Create Donor
+                </button>
+
+                <a href="/Donor/Read" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
