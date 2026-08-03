@@ -1,8 +1,95 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model BloodDonation.Models.DashboardVM
+
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+
+    <div class="text-center mb-5">
+        <h2 class="text-danger">
+            Blood Bank Management Dashboard
+        </h2>
+
+        <p class="text-muted">
+            Welcome to the Blood Bank Management System
+        </p>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-3 mb-4">
+            <div class="card shadow border-0 text-center">
+                <div class="card-body">
+                    <h5>Total Donors</h5>
+                    <h2 class="text-primary">
+                        @Model.TotalDonors
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card shadow border-0 text-center">
+                <div class="card-body">
+                    <h5>Total Donations</h5>
+                    <h2 class="text-success">
+                        @Model.TotalDonations
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card shadow border-0 text-center">
+                <div class="card-body">
+                    <h5>Blood Collected</h5>
+                    <h2 class="text-danger">
+                        @Model.TotalBloodCollected mL
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card shadow border-0 text-center">
+                <div class="card-body">
+                    <h5>Blood Groups</h5>
+                    <h2 class="text-warning">
+                        @Model.TotalBloodGroups
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow mt-4">
+
+        <div class="card-header bg-danger text-white">
+            Quick Actions
+        </div>
+
+        <div class="card-body text-center">
+
+            <a href="/Donor/Create" class="btn btn-success me-2">
+                Register Donor
+            </a>
+
+            <a href="/Donation/Create" class="btn btn-primary me-2">
+                Record Donation
+            </a>
+
+            <a href="/Donor/Read" class="btn btn-secondary me-2">
+                View Donors
+            </a>
+
+            <a href="/Donation/Read" class="btn btn-dark">
+                View Donations
+            </a>
+
+        </div>
+
+    </div>
+
 </div>

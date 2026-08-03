@@ -20,6 +20,10 @@ public partial class BloodBankDbContext : DbContext
 
     public virtual DbSet<Donor> Donors { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<User> Users { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("name=DbConn");
 
@@ -59,6 +63,52 @@ public partial class BloodBankDbContext : DbContext
             entity.Property(e => e.FullName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.RoleId).HasName("PK__Role__8AFACE1AB451AD6D");
+
+            entity.ToTable("Role");
+
+            entity.HasIndex(e => e.RoleName, "UQ__Role__8A2B6160BA3AFE8E").IsUnique();
+
+            entity.Property(e => e.RoleName)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.UserId).HasName("PK__User__1788CC4CCD4BE68B");
+
+            entity.ToTable("User");
+
+            entity.HasIndex(e => e.Username, "UQ__User__536C85E4BDD165B6").IsUnique();
+
+            entity.HasIndex(e => e.Email, "UQ__User__A9D10534DBC91861").IsUnique();
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.FullName)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Username)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_User_Role");
         });
 
         OnModelCreatingPartial(modelBuilder);
