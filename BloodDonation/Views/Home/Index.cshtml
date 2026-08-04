@@ -12,9 +12,31 @@
         </h2>
 
         <p class="text-muted">
-            Welcome to the Blood Bank Management System
+            @if (!string.IsNullOrWhiteSpace(Model.WelcomeName))
+            {
+                <text>Welcome back, @Model.WelcomeName!</text>
+            }
+            else
+            {
+                <text>Welcome to the Blood Bank Management System</text>
+            }
         </p>
     </div>
+
+    @if (Model.DonationsLast30Days == 0)
+    {
+        <div class="alert alert-warning">
+            <strong>Low Activity:</strong> No donations have been recorded in the last 30 days.
+        </div>
+    }
+
+    @if (Model.BloodGroupsWithNoDonors.Any())
+    {
+        <div class="alert alert-warning">
+            <strong>No Donor Coverage:</strong> No registered donors for
+            @string.Join(", ", Model.BloodGroupsWithNoDonors).
+        </div>
+    }
 
     <div class="row">
 
@@ -92,4 +114,80 @@
 
     </div>
 
+    <div class="row mt-4">
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-danger text-white">
+                    Donors by Blood Group
+                </div>
+                <div class="card-body">
+                    <canvas id="bloodGroupChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-danger text-white">
+                    Recent Donations
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.RecentDonations.Any())
+                    {
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Donor</th>
+                                    <th>Blood Group</th>
+                                    <th>Date</th>
+                                    <th>Volume</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var donation in Model.RecentDonations)
+                                {
+                                    <tr>
+                                        <td>@donation.Donor.FullName</td>
+                                        <td>@donation.Donor.BloodGroup.Trim()</td>
+                                        <td>@donation.DonationDate.ToString("MMM dd, yyyy")</td>
+                                        <td>@donation.VolumeMl mL</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center p-3 mb-0">No donations recorded yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script>
+        const bloodGroupCtx = document.getElementById('bloodGroupChart');
+        new Chart(bloodGroupCtx, {
+            type: 'bar',
+            data: {
+                labels: @Json.Serialize(Model.BloodGroupBreakdown.Select(g => g.BloodGroup)),
+                datasets: [{
+                    label: 'Donors',
+                    data: @Json.Serialize(Model.BloodGroupBreakdown.Select(g => g.DonorCount)),
+                    backgroundColor: '#dc3545'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        });
+    </script>
+}

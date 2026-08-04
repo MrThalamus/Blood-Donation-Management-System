@@ -1,9 +1,11 @@
 ﻿using BloodDonation.EF;
 using BloodDonation.EF.Tables;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonation.Controllers
 {
+    [Authorize(Roles = "Admin,Staff")]
     public class DonationController : Controller
     {
         BloodBankDbContext dc;

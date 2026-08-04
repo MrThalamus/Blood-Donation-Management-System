@@ -2,7 +2,9 @@ using BloodDonation.EF;
 using BloodDonation.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace BloodDonation.Controllers
 {
@@ -20,6 +22,8 @@ namespace BloodDonation.Controllers
         {
             DashboardVM dashboard = new DashboardVM();
 
+            dashboard.WelcomeName = User.FindFirst("FullName")?.Value ?? User.Identity?.Name ?? "";
+
             dashboard.TotalDonors = dc.Donors.Count();
 
             dashboard.TotalDonations = dc.Donations.Count();
@@ -30,6 +34,34 @@ namespace BloodDonation.Controllers
                                            .Select(d => d.BloodGroup)
                                            .Distinct()
                                            .Count();
+
+            dashboard.BloodGroupBreakdown = dc.Donors
+                                              .GroupBy(d => d.BloodGroup)
+                                              .Select(g => new BloodGroupStatVM
+                                              {
+                                                  BloodGroup = g.Key.Trim(),
+                                                  DonorCount = g.Count()
+                                              })
+                                              .OrderBy(g => g.BloodGroup)
+                                              .ToList();
+
+            dashboard.RecentDonations = dc.Donations
+                                          .Include(d => d.Donor)
+                                          .OrderByDescending(d => d.DonationDate)
+                                          .Take(5)
+                                          .ToList();
+
+            var thirtyDaysAgo = DateOnly.FromDateTime(DateTime.Today.AddDays(-30));
+
+            dashboard.DonationsLast30Days = dc.Donations.Count(d => d.DonationDate >= thirtyDaysAgo);
+
+            string[] allBloodGroups = { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
+
+            var groupsWithDonors = dc.Donors.Select(d => d.BloodGroup.Trim()).Distinct().ToList();
+
+            dashboard.BloodGroupsWithNoDonors = allBloodGroups
+                                                 .Except(groupsWithDonors)
+                                                 .ToList();
 
             return View(dashboard);
         }

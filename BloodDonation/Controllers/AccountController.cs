@@ -38,10 +38,22 @@ namespace BloodDonation.Controllers
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u =>
                     u.Username == login.Username &&
-                    u.PasswordHash == login.Password &&
                     u.IsActive);
 
-            if (user == null)
+            bool passwordValid = false;
+            if (user != null)
+            {
+                try
+                {
+                    passwordValid = BCrypt.Net.BCrypt.Verify(login.Password, user.PasswordHash);
+                }
+                catch (BCrypt.Net.SaltParseException)
+                {
+                    passwordValid = false;
+                }
+            }
+
+            if (!passwordValid)
             {
                 ModelState.AddModelError("", "Invalid username or password.");
                 return View(login);
@@ -49,6 +61,7 @@ namespace BloodDonation.Controllers
 
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user!.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, user.Role.RoleName),
                 new Claim("FullName", user.FullName)
