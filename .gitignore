@@ -12,3 +12,6 @@
 # Rider/ReSharper (optional)
 _ReSharper*/
 *.DotSettings.user
+
+# Local-only Claude Code commands (never pushed to the repo)
+.claude/commands/push.md
