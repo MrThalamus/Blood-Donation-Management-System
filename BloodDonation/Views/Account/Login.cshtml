@@ -1,65 +1,87 @@
-﻿@model BloodDonation.Models.LoginVM
+@model BloodDonation.Models.LoginVM
 
 @{
     ViewData["Title"] = "Login";
 }
 
-<div class="row justify-content-center mt-5">
+@* The auth shell in _Layout already centres and constrains this page, so there
+   is deliberately no .row/.col wrapper here - nesting one inside the shell is
+   what made this form render far too narrow. *@
 
-    <div class="col-md-5">
+<div class="auth-brand">
 
-        <div class="card shadow">
+    <span class="brand-mark">
+        <svg><use href="#i-drop" /></svg>
+    </span>
 
-            <div class="card-header bg-danger text-white text-center">
-                <h3>Blood Bank Login</h3>
-            </div>
+    <span>
+        <span class="brand-title d-block">Blood Bank</span>
+        <span class="brand-sub">Management System</span>
+    </span>
 
-            <div class="card-body">
+</div>
 
-                <form method="post">
+<div class="card">
 
-                    <div class="mb-3">
+    <div class="card-body p-4 p-sm-5">
 
-                        <label class="form-label">Username</label>
+        <h3 class="mb-1">Sign in</h3>
 
-                        <input asp-for="Username" class="form-control" />
+        <p class="text-muted mb-4" style="font-size:.9rem;">
+            Enter your staff credentials to continue.
+        </p>
 
-                        <span asp-validation-for="Username"
-                              class="text-danger"></span>
+        <form method="post">
 
-                    </div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 mb-3"
+                 role="alert"></div>
 
-                    <div class="mb-3">
+            <div class="mb-3">
 
-                        <label class="form-label">Password</label>
+                <label class="form-label" asp-for="Username">Username</label>
 
-                        <input asp-for="Password"
-                               class="form-control" />
+                <input asp-for="Username"
+                       class="form-control form-control-lg"
+                       autocomplete="username"
+                       autofocus
+                       placeholder="Enter your username" />
 
-                        <span asp-validation-for="Password"
-                              class="text-danger"></span>
-
-                    </div>
-
-                    <div class="d-grid">
-
-                        <button class="btn btn-danger">
-                            Login
-                        </button>
-
-                    </div>
-
-                </form>
+                <span asp-validation-for="Username" class="text-danger small"></span>
 
             </div>
 
-        </div>
+            <div class="mb-4">
+
+                <label class="form-label" asp-for="Password">Password</label>
+
+                <input asp-for="Password"
+                       class="form-control form-control-lg"
+                       autocomplete="current-password"
+                       placeholder="Enter your password" />
+
+                <span asp-validation-for="Password" class="text-danger small"></span>
+
+            </div>
+
+            <div class="d-grid">
+
+                <button type="submit" class="btn btn-danger btn-lg">
+                    Sign in
+                </button>
+
+            </div>
+
+        </form>
 
     </div>
 
 </div>
 
+<p class="text-center text-muted mt-4 mb-0" style="font-size:.78rem;">
+    Authorised personnel only &middot; &copy; @DateTime.Now.Year Blood Bank Management System
+</p>
+
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
-} 
+}

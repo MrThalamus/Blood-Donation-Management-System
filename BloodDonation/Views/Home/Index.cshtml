@@ -1,168 +1,233 @@
-﻿@model BloodDonation.Models.DashboardVM
+@model BloodDonation.Models.DashboardVM
 
 @{
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container mt-4">
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
 
-    <div class="text-center mb-5">
-        <h2 class="text-danger">
-            Blood Bank Management Dashboard
-        </h2>
-
-        <p class="text-muted">
+    <div>
+        <h2 class="mb-1">
             @if (!string.IsNullOrWhiteSpace(Model.WelcomeName))
             {
-                <text>Welcome back, @Model.WelcomeName!</text>
+                <text>Welcome back, @Model.WelcomeName</text>
             }
             else
             {
-                <text>Welcome to the Blood Bank Management System</text>
+                <text>Welcome back</text>
             }
+        </h2>
+
+        <p class="text-muted mb-0" style="font-size:.9rem;">
+            Here is what is happening in the blood bank today, @DateTime.Now.ToString("dd MMMM yyyy").
         </p>
     </div>
 
-    @if (Model.DonationsLast30Days == 0)
-    {
-        <div class="alert alert-warning">
-            <strong>Low Activity:</strong> No donations have been recorded in the last 30 days.
-        </div>
-    }
+    <div class="d-flex flex-wrap gap-2">
 
-    @if (Model.BloodGroupsWithNoDonors.Any())
-    {
-        <div class="alert alert-warning">
-            <strong>No Donor Coverage:</strong> No registered donors for
-            @string.Join(", ", Model.BloodGroupsWithNoDonors).
-        </div>
-    }
+        <a href="/Donor/Create" class="btn btn-danger d-inline-flex align-items-center gap-2">
+            <svg width="16" height="16"><use href="#i-users" /></svg>
+            Register Donor
+        </a>
 
-    <div class="row">
+        <a href="/Donation/Create" class="btn btn-secondary d-inline-flex align-items-center gap-2">
+            <svg width="16" height="16"><use href="#i-heart" /></svg>
+            Record Donation
+        </a>
 
-        <div class="col-md-3 mb-4">
-            <div class="card shadow border-0 text-center">
-                <div class="card-body">
-                    <h5>Total Donors</h5>
-                    <h2 class="text-primary">
-                        @Model.TotalDonors
-                    </h2>
-                </div>
-            </div>
-        </div>
+    </div>
 
-        <div class="col-md-3 mb-4">
-            <div class="card shadow border-0 text-center">
-                <div class="card-body">
-                    <h5>Total Donations</h5>
-                    <h2 class="text-success">
-                        @Model.TotalDonations
-                    </h2>
-                </div>
-            </div>
-        </div>
+</div>
 
-        <div class="col-md-3 mb-4">
-            <div class="card shadow border-0 text-center">
-                <div class="card-body">
-                    <h5>Blood Collected</h5>
-                    <h2 class="text-danger">
-                        @Model.TotalBloodCollected mL
-                    </h2>
-                </div>
-            </div>
+@if (Model.DonationsLast30Days == 0)
+{
+    <div class="alert alert-warning">
+        <strong>Low activity.</strong>
+        No donations have been recorded in the last 30 days.
+    </div>
+}
+
+@if (Model.BloodGroupsWithNoDonors.Any())
+{
+    <div class="alert alert-warning">
+        <strong>No donor coverage.</strong>
+        There are no registered donors for
+        @string.Join(", ", Model.BloodGroupsWithNoDonors).
+    </div>
+}
+
+@* ------------------------------------------------------------- stats --- *@
+
+<div class="stat-grid mb-4">
+
+    <div class="stat-card stat-red">
+
+        <div class="stat-icon">
+            <svg><use href="#i-users" /></svg>
         </div>
 
-        <div class="col-md-3 mb-4">
-            <div class="card shadow border-0 text-center">
-                <div class="card-body">
-                    <h5>Blood Groups</h5>
-                    <h2 class="text-warning">
-                        @Model.TotalBloodGroups
-                    </h2>
-                </div>
-            </div>
+        <div class="stat-label">Total Donors</div>
+
+        <div class="stat-value">@Model.TotalDonors</div>
+
+        <div class="stat-foot">Registered in the system</div>
+
+    </div>
+
+    <div class="stat-card stat-violet">
+
+        <div class="stat-icon">
+            <svg><use href="#i-heart" /></svg>
+        </div>
+
+        <div class="stat-label">Total Donations</div>
+
+        <div class="stat-value">@Model.TotalDonations</div>
+
+        <div class="stat-foot">@Model.DonationsLast30Days in the last 30 days</div>
+
+    </div>
+
+    <div class="stat-card stat-teal">
+
+        <div class="stat-icon">
+            <svg><use href="#i-beaker" /></svg>
+        </div>
+
+        <div class="stat-label">Blood Collected</div>
+
+        <div class="stat-value">
+            @Model.TotalBloodCollected.ToString("N0")<span class="unit">mL</span>
+        </div>
+
+        <div class="stat-foot">
+            Approximately @((Model.TotalBloodCollected / 1000.0).ToString("0.#")) litres
         </div>
 
     </div>
 
-    <div class="card shadow mt-4">
+    <div class="stat-card stat-amber">
 
-        <div class="card-header bg-danger text-white">
-            Quick Actions
+        <div class="stat-icon">
+            <svg><use href="#i-drop" /></svg>
         </div>
 
-        <div class="card-body text-center">
+        <div class="stat-label">Blood Groups</div>
 
-            <a href="/Donor/Create" class="btn btn-success me-2">
-                Register Donor
-            </a>
+        <div class="stat-value">@Model.TotalBloodGroups<span class="unit">/ 8</span></div>
 
-            <a href="/Donation/Create" class="btn btn-primary me-2">
-                Record Donation
-            </a>
+        <div class="stat-foot">Groups with at least one donor</div>
 
-            <a href="/Donor/Read" class="btn btn-secondary me-2">
-                View Donors
-            </a>
+    </div>
 
-            <a href="/Donation/Read" class="btn btn-dark">
-                View Donations
-            </a>
+</div>
+
+@* ------------------------------------------------------ chart + recent --- *@
+
+<div class="row g-4">
+
+    <div class="col-xl-5">
+
+        <div class="card h-100">
+
+            <div class="card-header d-flex align-items-center gap-2">
+                <svg width="17" height="17" class="text-danger"><use href="#i-chart" /></svg>
+                Donors by Blood Group
+            </div>
+
+            <div class="card-body">
+
+                @if (Model.BloodGroupBreakdown.Any())
+                {
+                    <canvas id="bloodGroupChart" height="230"></canvas>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <svg><use href="#i-inbox" /></svg>
+                        <div>No donors registered yet.</div>
+                    </div>
+                }
+
+            </div>
 
         </div>
 
     </div>
 
-    <div class="row mt-4">
+    <div class="col-xl-7">
 
-        <div class="col-md-6 mb-4">
-            <div class="card shadow h-100">
-                <div class="card-header bg-danger text-white">
-                    Donors by Blood Group
-                </div>
-                <div class="card-body">
-                    <canvas id="bloodGroupChart"></canvas>
-                </div>
-            </div>
-        </div>
+        <div class="card h-100">
 
-        <div class="col-md-6 mb-4">
-            <div class="card shadow h-100">
-                <div class="card-header bg-danger text-white">
+            <div class="card-header d-flex align-items-center justify-content-between">
+
+                <span class="d-flex align-items-center gap-2">
+                    <svg width="17" height="17" class="text-danger"><use href="#i-clock" /></svg>
                     Recent Donations
-                </div>
-                <div class="card-body p-0">
-                    @if (Model.RecentDonations.Any())
-                    {
-                        <table class="table table-hover mb-0">
+                </span>
+
+                <a href="/Donation/Read" class="btn btn-secondary btn-sm">
+                    View all
+                </a>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                @if (Model.RecentDonations.Any())
+                {
+                    <div class="table-wrap">
+
+                        <table class="table table-hover">
+
                             <thead>
                                 <tr>
                                     <th>Donor</th>
                                     <th>Blood Group</th>
                                     <th>Date</th>
-                                    <th>Volume</th>
+                                    <th class="text-end">Volume</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 @foreach (var donation in Model.RecentDonations)
                                 {
                                     <tr>
-                                        <td>@donation.Donor.FullName</td>
-                                        <td>@donation.Donor.BloodGroup.Trim()</td>
-                                        <td>@donation.DonationDate.ToString("MMM dd, yyyy")</td>
-                                        <td>@donation.VolumeMl mL</td>
+
+                                        <td class="fw-semibold">@donation.Donor.FullName</td>
+
+                                        <td>
+                                            <span class="blood-chip">
+                                                @donation.Donor.BloodGroup.Trim()
+                                            </span>
+                                        </td>
+
+                                        <td class="text-muted">
+                                            @donation.DonationDate.ToString("dd MMM yyyy")
+                                        </td>
+
+                                        <td class="text-end fw-semibold">
+                                            @donation.VolumeMl mL
+                                        </td>
+
                                     </tr>
                                 }
                             </tbody>
+
                         </table>
-                    }
-                    else
-                    {
-                        <p class="text-muted text-center p-3 mb-0">No donations recorded yet.</p>
-                    }
-                </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <svg><use href="#i-inbox" /></svg>
+                        <div>No donations recorded yet.</div>
+                    </div>
+                }
+
             </div>
+
         </div>
 
     </div>
@@ -170,24 +235,66 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-    <script>
-        const bloodGroupCtx = document.getElementById('bloodGroupChart');
-        new Chart(bloodGroupCtx, {
-            type: 'bar',
-            data: {
-                labels: @Json.Serialize(Model.BloodGroupBreakdown.Select(g => g.BloodGroup)),
-                datasets: [{
-                    label: 'Donors',
-                    data: @Json.Serialize(Model.BloodGroupBreakdown.Select(g => g.DonorCount)),
-                    backgroundColor: '#dc3545'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-            }
-        });
-    </script>
+
+    @if (Model.BloodGroupBreakdown.Any())
+    {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+        <script>
+            (function () {
+                var canvas = document.getElementById('bloodGroupChart');
+
+                if (!canvas || typeof Chart === 'undefined') {
+                    return;
+                }
+
+                var ctx = canvas.getContext('2d');
+
+                // Vertical brand gradient so the bars match the theme.
+                var fill = ctx.createLinearGradient(0, 0, 0, 230);
+                fill.addColorStop(0, '#F43F5E');
+                fill.addColorStop(1, '#BE123C');
+
+                new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: @Json.Serialize(Model.BloodGroupBreakdown.Select(g => g.BloodGroup)),
+                        datasets: [{
+                            label: 'Donors',
+                            data: @Json.Serialize(Model.BloodGroupBreakdown.Select(g => g.DonorCount)),
+                            backgroundColor: fill,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            maxBarThickness: 38
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0F172A',
+                                padding: 10,
+                                cornerRadius: 8,
+                                displayColors: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#64748B', font: { weight: '600' } }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                border: { display: false },
+                                grid: { color: '#EEF2F7' },
+                                ticks: { precision: 0, color: '#94A3B8' }
+                            }
+                        }
+                    }
+                });
+            })();
+        </script>
+    }
+
 }

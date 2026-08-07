@@ -1,4 +1,4 @@
-﻿@model List<BloodDonation.EF.Tables.Donor>
+﻿@model BloodDonation.Models.DonorListVM
 
 @{
     ViewBag.Title = "Filter Donors by Blood Group";
@@ -16,7 +16,7 @@
 
             <form method="get" class="row g-3 mb-4">
 
-                <div class="col-md-6">
+                <div class="col-md-4">
 
                     <label class="form-label fw-bold">
                         Select Blood Group
@@ -24,15 +24,35 @@
 
                     <select name="bloodGroup" class="form-select">
 
-                        <option value="">-- Select Blood Group --</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
+                        <option value="">-- All Blood Groups --</option>
+
+                        @foreach (var group in BloodGroups.All)
+                        {
+                            <option value="@group" selected="@(Model.BloodGroup == group)">
+                                @group
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label fw-bold">
+                        Select City
+                    </label>
+
+                    <select name="city" class="form-select">
+
+                        <option value="">-- All Cities --</option>
+
+                        @foreach (var city in Model.Cities)
+                        {
+                            <option value="@city" selected="@(Model.City == city)">
+                                @city
+                            </option>
+                        }
 
                     </select>
 
@@ -76,19 +96,19 @@
 
                 <tbody>
 
-                    @if (Model.Count == 0)
+                    @if (Model.Donors.Count == 0)
                     {
                         <tr>
 
                             <td colspan="7" class="text-center text-muted">
-                                No donors found for the selected blood group.
+                                No donors found for the selected filters.
                             </td>
 
                         </tr>
                     }
                     else
                     {
-                        @foreach (var donor in Model)
+                        @foreach (var donor in Model.Donors)
                         {
                             <tr>
 
@@ -98,7 +118,7 @@
 
                                 <td>
                                     <span class="badge bg-danger">
-                                        @donor.BloodGroup
+                                        @donor.BloodGroup.Trim()
                                     </span>
                                 </td>
 
@@ -131,6 +151,8 @@
                 </tbody>
 
             </table>
+
+            <partial name="_Pagination" model="Model.Pager" />
 
         </div>
 

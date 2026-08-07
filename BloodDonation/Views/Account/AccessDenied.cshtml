@@ -1,0 +1,47 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container mt-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-body text-center p-5">
+
+            <h1 class="display-1 text-danger fw-bold">
+                403
+            </h1>
+
+            <h2 class="mb-3">
+                Access Denied
+            </h2>
+
+            <p class="text-muted fs-5">
+                You do not have permission to view this page.
+                This section is restricted to Administrators only.
+            </p>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <p class="text-muted">
+                    You are signed in as
+                    <strong>@User.Identity.Name</strong>.
+                    If you believe this is a mistake, please contact an Administrator.
+                </p>
+            }
+
+            <hr class="my-4" />
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-danger btn-lg">
+
+                Back to Dashboard
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

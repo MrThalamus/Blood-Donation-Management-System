@@ -14,19 +14,7 @@
 
 </div>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["Success"]
-    </div>
-}
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["Error"]
-    </div>
-}
+@* Success/Error messages are rendered globally by Views/Shared/_Alerts.cshtml *@
 
 <div class="card shadow">
 

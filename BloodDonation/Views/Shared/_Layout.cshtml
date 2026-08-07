@@ -1,164 +1,280 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    // Marks a sidebar item active. Action is optional: pass it only where a
+    // controller has several separately-listed screens (the report pages).
+    Func<string, string?, string> navActive = (controller, action) =>
+        currentController.Equals(controller, StringComparison.OrdinalIgnoreCase)
+        && (action == null || currentAction.Equals(action, StringComparison.OrdinalIgnoreCase))
+            ? "active" : "";
+
+    var displayName = User.FindFirst("FullName")?.Value ?? User.Identity?.Name ?? "";
+    var roleName = User.IsInRole("Admin") ? "Admin" : "Staff";
+
+    var initials = string.Join("", displayName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => char.ToUpperInvariant(part[0])));
+
+    if (string.IsNullOrEmpty(initials))
+    {
+        initials = "U";
+    }
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Blood Bank Management System</title>
     <script type="importmap"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BloodDonation.styles.css" asp-append-version="true" />
+
+    @* Restore the saved sidebar state before first paint, otherwise the sidebar
+       renders expanded and visibly snaps shut once site.js runs. *@
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('sidebarCollapsed') === '1') {
+                    document.documentElement.classList.add('sidebar-collapsed');
+                }
+            } catch (e) { /* private mode / storage disabled */ }
+        })();
+    </script>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" 
-                asp-controller="Home" 
-                asp-action="Index">BloodDonation</a>
-                <button class="navbar-toggler" type="button" 
-                data-bs-toggle="collapse" data-bs-target=".navbar-collapse" 
-                aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav">
 
-                        
+    @* Inline icon sprite - no CDN, no icon font, works offline. *@
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+        <symbol id="i-drop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.5s6 6.4 6 10.6a6 6 0 0 1-12 0C6 8.9 12 2.5 12 2.5z" />
+        </symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" />
+        </symbol>
+        <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </symbol>
+        <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z" />
+        </symbol>
+        <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+        </symbol>
+        <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+        </symbol>
+        <symbol id="i-hash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="9" x2="20" y2="9" /><line x1="4" y1="15" x2="20" y2="15" />
+            <line x1="10" y1="3" x2="8" y2="21" /><line x1="16" y1="3" x2="14" y2="21" />
+        </symbol>
+        <symbol id="i-beaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 3v6.5L4.5 17A2.5 2.5 0 0 0 6.7 21h10.6a2.5 2.5 0 0 0 2.2-4L15 9.5V3" />
+            <line x1="8" y1="3" x2="16" y2="3" /><line x1="6.5" y1="14" x2="17.5" y2="14" />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+        </symbol>
+        <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+        </symbol>
+        <symbol id="i-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+            <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+        </symbol>
+    </svg>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-white"
-                               asp-controller="Home"
-                               asp-action="Index">
-                                Home
+    @if (isAuthenticated)
+    {
+        <div class="app-shell">
+
+            <aside class="sidebar" id="appSidebar">
+
+                <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+
+                    <span class="brand-mark">
+                        <svg><use href="#i-drop" /></svg>
+                    </span>
+
+                    <span class="brand-text">
+                        <span class="brand-title d-block">Blood Bank</span>
+                        <span class="brand-sub">Management</span>
+                    </span>
+
+                </a>
+
+                <div class="nav-section">Overview</div>
+
+                <ul class="sidebar-nav">
+
+                    <li>
+                        <a class="nav-item-link @navActive("Home", "Index")"
+                           asp-controller="Home" asp-action="Index" title="Dashboard">
+                            <svg><use href="#i-grid" /></svg> <span class="nav-label">Dashboard</span>
+                        </a>
+                    </li>
+
+                </ul>
+
+                <div class="nav-section">Management</div>
+
+                <ul class="sidebar-nav">
+
+                    <li>
+                        <a class="nav-item-link @navActive("Donor", "Read")"
+                           asp-controller="Donor" asp-action="Read" title="Donors">
+                            <svg><use href="#i-users" /></svg> <span class="nav-label">Donors</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-item-link @navActive("Donation", "Read")"
+                           asp-controller="Donation" asp-action="Read" title="Donations">
+                            <svg><use href="#i-heart" /></svg> <span class="nav-label">Donations</span>
+                        </a>
+                    </li>
+
+                </ul>
+
+                <div class="nav-section">Reports</div>
+
+                <ul class="sidebar-nav">
+
+                    <li>
+                        <a class="nav-item-link @navActive("Donor", "Filter")"
+                           asp-controller="Donor" asp-action="Filter" title="Filter Donors">
+                            <svg><use href="#i-filter" /></svg> <span class="nav-label">Filter Donors</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-item-link @navActive("Donor", "RecentDonors")"
+                           asp-controller="Donor" asp-action="RecentDonors" title="Recent Donors">
+                            <svg><use href="#i-clock" /></svg> <span class="nav-label">Recent Donors</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-item-link @navActive("Donor", "DonationCount")"
+                           asp-controller="Donor" asp-action="DonationCount" title="Donation Count">
+                            <svg><use href="#i-hash" /></svg> <span class="nav-label">Donation Count</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-item-link @navActive("Donation", "TotalBloodCollected")"
+                           asp-controller="Donation" asp-action="TotalBloodCollected" title="Blood Collected">
+                            <svg><use href="#i-beaker" /></svg> <span class="nav-label">Blood Collected</span>
+                        </a>
+                    </li>
+
+                </ul>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="nav-section">Administration</div>
+
+                    <ul class="sidebar-nav">
+
+                        <li>
+                            <a class="nav-item-link @navActive("User", null)"
+                               asp-controller="User" asp-action="Index" title="User Management">
+                                <svg><use href="#i-shield" /></svg> <span class="nav-label">User Management</span>
                             </a>
                         </li>
-                        
-
-                        <li class="nav-item">
-                            <a class="nav-link text-white"
-                               asp-controller="Donor"
-                               asp-action="Read">
-                                Donors
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-white"
-                               asp-controller="Donation"
-                               asp-action="Read">
-                                Donations
-                            </a>
-                        </li>
-
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle text-white"
-                               href="#"
-                               role="button"
-                               data-bs-toggle="dropdown">
-                                Reports
-                            </a>
-
-                            <ul class="dropdown-menu">
-
-                                <li>
-                                    <a class="dropdown-item"
-                                       asp-controller="Donor"
-                                       asp-action="Filter">
-                                        Filter by Blood Group
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item"
-                                       asp-controller="Donor"
-                                       asp-action="RecentDonors">
-                                        Recent Donors
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item"
-                                       asp-controller="Donor"
-                                       asp-action="DonationCount">
-                                        Donation Count
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a class="dropdown-item"
-                                       asp-controller="Donation"
-                                       asp-action="TotalBloodCollected">
-                                        Total Blood Collected
-                                    </a>
-                                </li>
-                                
-
-                            </ul>
-
-                        </li>
-
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white"
-                                   asp-controller="User"
-                                   asp-action="Index">
-                                    User Management
-                                </a>
-                            </li>
-                        }
 
                     </ul>
+                }
 
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="navbar-text text-white mb-0">
-                                Welcome, @User.Identity.Name
-                            </span>
-                            <a class="btn btn-outline-light btn-sm"
-                               asp-controller="Account"
-                               asp-action="Logout">
-                                Logout
-                            </a>
-                        </div>
-                    }
+                <div class="sidebar-footer">
+                    &copy; @DateTime.Now.Year Blood Bank MS
                 </div>
+
+            </aside>
+
+            <div class="app-main">
+
+                <header class="topbar">
+
+                    <button class="sidebar-toggle" type="button" id="sidebarToggle"
+                            aria-label="Toggle navigation" aria-controls="appSidebar" aria-expanded="true">
+                        <svg width="20" height="20"><use href="#i-menu" /></svg>
+                    </button>
+
+                    <h1 class="topbar-title">@ViewData["Title"]</h1>
+
+                    <div class="topbar-spacer"></div>
+
+                    <div class="user-chip">
+
+                        <span class="user-meta">
+                            <span class="user-name d-block">@displayName</span>
+                            <span class="user-role">@roleName</span>
+                        </span>
+
+                        <span class="avatar">@initials</span>
+
+                    </div>
+
+                    <form method="post" asp-controller="Account" asp-action="Logout" class="mb-0">
+
+                        <button type="submit" class="btn btn-secondary btn-sm d-inline-flex align-items-center gap-1">
+                            <svg width="15" height="15"><use href="#i-logout" /></svg>
+                            <span class="d-none d-sm-inline">Logout</span>
+                        </button>
+
+                    </form>
+
+                </header>
+
+                <main class="app-content">
+
+                    <partial name="_Alerts" />
+
+                    @RenderBody()
+
+                </main>
+
+                <footer class="app-footer">
+                    Blood Bank Management System &middot; ASP.NET Core MVC, EF Core &amp; Bootstrap
+                </footer>
+
             </div>
-        </nav>
-    </header>
-    <main class="flex-grow-1">
-
-        <div class="container py-3">
-            @RenderBody()
-        </div>
-
-    </main>
-
-    <footer class="bg-dark text-white text-center py-3 mt-5">
-
-        <div class="container">
-
-            <h6 class="mb-1">
-                Blood Bank Management System
-            </h6>
-
-            <small>
-                Developed using ASP.NET Core MVC, Entity Framework Core & Bootstrap
-            </small>
-
-            <br />
-
-            <small>
-                © @DateTime.Now.Year All Rights Reserved
-            </small>
 
         </div>
+    }
+    else
+    {
+        <div class="auth-shell">
+            <div class="auth-panel">
 
-    </footer>
+                <partial name="_Alerts" />
+
+                @RenderBody()
+
+            </div>
+        </div>
+    }
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

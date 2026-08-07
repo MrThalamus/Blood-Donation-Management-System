@@ -1,0 +1,101 @@
+@model BloodDonation.Models.PagerVM
+
+@functions {
+    // Rebuilds the current URL with a different page number, carrying every other
+    // query string value through. That is what keeps active search filters applied
+    // when the user moves between pages.
+    string PageUrl(int page)
+    {
+        var parts = new List<string>();
+
+        foreach (var entry in ViewContext.HttpContext.Request.Query)
+        {
+            if (string.Equals(entry.Key, "page", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            foreach (var value in entry.Value)
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    parts.Add($"{Uri.EscapeDataString(entry.Key)}={Uri.EscapeDataString(value)}");
+                }
+            }
+        }
+
+        parts.Add($"page={page}");
+
+        return $"{ViewContext.HttpContext.Request.Path}?{string.Join("&", parts)}";
+    }
+}
+
+@if (Model.TotalItems > 0)
+{
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+        <small class="text-muted">
+            Showing @Model.FirstItemNumber - @Model.LastItemNumber of @Model.TotalItems
+        </small>
+
+        @if (Model.TotalPages > 1)
+        {
+            // Show a window of at most 5 page numbers around the current page.
+            int windowStart = Math.Max(1, Model.PageNumber - 2);
+            int windowEnd = Math.Min(Model.TotalPages, windowStart + 4);
+            windowStart = Math.Max(1, windowEnd - 4);
+
+            <nav aria-label="Page navigation">
+
+                <ul class="pagination mb-0">
+
+                    <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+                        <a class="page-link" href="@PageUrl(Model.PageNumber - 1)">
+                            Previous
+                        </a>
+                    </li>
+
+                    @if (windowStart > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@PageUrl(1)">1</a>
+                        </li>
+
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+
+                    @for (int i = windowStart; i <= windowEnd; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" href="@PageUrl(i)">@i</a>
+                        </li>
+                    }
+
+                    @if (windowEnd < Model.TotalPages)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+
+                        <li class="page-item">
+                            <a class="page-link" href="@PageUrl(Model.TotalPages)">
+                                @Model.TotalPages
+                            </a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                        <a class="page-link" href="@PageUrl(Model.PageNumber + 1)">
+                            Next
+                        </a>
+                    </li>
+
+                </ul>
+
+            </nav>
+        }
+
+    </div>
+}

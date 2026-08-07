@@ -28,7 +28,9 @@ namespace BloodDonation.Controllers
 
             dashboard.TotalDonations = dc.Donations.Count();
 
-            dashboard.TotalBloodCollected = dc.Donations.Sum(d => d.VolumeMl);
+            // Cast to int? so an empty Donation table returns SQL NULL -> 0
+            // instead of failing to materialize into a non-nullable int.
+            dashboard.TotalBloodCollected = dc.Donations.Sum(d => (int?)d.VolumeMl) ?? 0;
 
             dashboard.TotalBloodGroups = dc.Donors
                                            .Select(d => d.BloodGroup)

@@ -16,6 +16,8 @@
 
             <form method="post">
 
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
                 <input type="hidden"
                        name="DonationId"
                        value="@Model.DonationId" />

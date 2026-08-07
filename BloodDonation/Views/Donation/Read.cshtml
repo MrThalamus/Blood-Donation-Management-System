@@ -1,4 +1,4 @@
-﻿@model List<BloodDonation.EF.Tables.Donation>
+﻿@model BloodDonation.Models.DonationListVM
 
 @{
     ViewBag.Title = "Donation List";
@@ -22,13 +22,82 @@
 
         <div class="card-body">
 
+            <form method="get" class="row g-3 mb-4">
+
+                <div class="col-md-3">
+
+                    <label class="form-label fw-bold">Donor</label>
+
+                    <select name="donorId" class="form-select">
+
+                        <option value="">-- All Donors --</option>
+
+                        @foreach (var donor in Model.Donors)
+                        {
+                            <option value="@donor.DonorId" selected="@(Model.DonorId == donor.DonorId)">
+                                @donor.FullName (#@donor.DonorId)
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <label class="form-label fw-bold">From Date</label>
+
+                    <input type="date"
+                           name="fromDate"
+                           class="form-control"
+                           value="@(Model.FromDate?.ToString("yyyy-MM-dd"))" />
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <label class="form-label fw-bold">To Date</label>
+
+                    <input type="date"
+                           name="toDate"
+                           class="form-control"
+                           value="@(Model.ToDate?.ToString("yyyy-MM-dd"))" />
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label class="form-label fw-bold">Camp Name</label>
+
+                    <input type="text"
+                           name="campName"
+                           class="form-control"
+                           placeholder="Search by camp"
+                           value="@Model.CampName" />
+
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end gap-2">
+
+                    <button type="submit" class="btn btn-danger w-100">
+                        Search
+                    </button>
+
+                    <a href="/Donation/Read" class="btn btn-secondary w-100">
+                        Reset
+                    </a>
+
+                </div>
+
+            </form>
+
             <table class="table table-bordered table-hover table-striped align-middle">
 
                 <thead class="table-danger">
 
                     <tr>
                         <th>Donation ID</th>
-                        <th>Donor ID</th>
+                        <th>Donor</th>
                         <th>Donation Date</th>
                         <th>Volume (mL)</th>
                         <th>Camp Name</th>
@@ -39,7 +108,7 @@
 
                 <tbody>
 
-                    @if (Model.Count == 0)
+                    @if (Model.Donations.Count == 0)
                     {
                         <tr>
                             <td colspan="6" class="text-center text-muted">
@@ -49,13 +118,19 @@
                     }
                     else
                     {
-                        @foreach (var donation in Model)
+                        @foreach (var donation in Model.Donations)
                         {
                             <tr>
 
                                 <td>@donation.DonationId</td>
 
-                                <td>@donation.DonorId</td>
+                                <td>
+                                    @donation.Donor.FullName
+
+                                    <small class="text-muted">
+                                        (#@donation.DonorId)
+                                    </small>
+                                </td>
 
                                 <td>
                                     @donation.DonationDate.ToString("dd MMM yyyy")
@@ -90,6 +165,8 @@
                 </tbody>
 
             </table>
+
+            <partial name="_Pagination" model="Model.Pager" />
 
         </div>
 

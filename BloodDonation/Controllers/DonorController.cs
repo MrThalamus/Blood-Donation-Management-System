@@ -10,15 +10,107 @@ namespace BloodDonation.Controllers
     [Authorize(Roles = "Admin,Staff")]
     public class DonorController : Controller
     {
+        private const int PageSize = 10;
+
         BloodBankDbContext dc;
         public DonorController(BloodBankDbContext dc)
         {
             this.dc = dc;
         }
-        public IActionResult Read()
+        /// <summary>
+        /// Applies the donor search filters. Each filter is optional and only
+        /// narrows the query when a value is supplied. Shared by Read and Filter
+        /// so the two screens can never disagree about what a filter means.
+        /// </summary>
+        private IQueryable<Donor> ApplyFilters(
+            IQueryable<Donor> query,
+            string? name,
+            string? bloodGroup,
+            string? city)
         {
-            var donors = dc.Donors.ToList();
-            return View(donors);
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                query = query.Where(d => d.FullName.Contains(name.Trim()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(bloodGroup))
+            {
+                query = query.Where(d => d.BloodGroup == bloodGroup.Trim());
+            }
+
+            if (!string.IsNullOrWhiteSpace(city))
+            {
+                query = query.Where(d => d.City == city.Trim());
+            }
+
+            return query;
+        }
+
+        /// <summary>
+        /// Distinct cities already recorded against donors, for the city dropdown.
+        /// </summary>
+        private List<string> GetCities()
+        {
+            return dc.Donors
+                     .Select(d => d.City)
+                     .Distinct()
+                     .OrderBy(c => c)
+                     .ToList();
+        }
+
+        /// <summary>
+        /// Runs the filtered query for one page of donors and returns the
+        /// populated view model. Shared by Read and Filter.
+        /// </summary>
+        private DonorListVM BuildDonorList(
+            string? name,
+            string? bloodGroup,
+            string? city,
+            int page)
+        {
+            var query = ApplyFilters(dc.Donors, name, bloodGroup, city);
+
+            var pager = new PagerVM
+            {
+                PageSize = PageSize,
+                TotalItems = query.Count()
+            };
+
+            // A page number out of range (bookmarked, hand-typed, or left over
+            // after a filter shrank the result set) must be pulled back in range,
+            // otherwise Skip receives a negative count and throws.
+            if (page < 1)
+            {
+                page = 1;
+            }
+
+            if (page > pager.TotalPages)
+            {
+                page = pager.TotalPages;
+            }
+
+            pager.PageNumber = page;
+
+            var donors = query
+                         .OrderBy(d => d.DonorId)
+                         .Skip((page - 1) * PageSize)
+                         .Take(PageSize)
+                         .ToList();
+
+            return new DonorListVM
+            {
+                Donors = donors,
+                Name = name,
+                BloodGroup = bloodGroup,
+                City = city,
+                Cities = GetCities(),
+                Pager = pager
+            };
+        }
+
+        public IActionResult Read(string? name, string? bloodGroup, string? city, int page = 1)
+        {
+            return View(BuildDonorList(name, bloodGroup, city, page));
         }
         [HttpGet]
         public IActionResult Create()
@@ -28,9 +120,7 @@ namespace BloodDonation.Controllers
         [HttpPost]
         public IActionResult Create(Donor donor) //================================================
         {
-            string[] validBloodGroups ={"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
-
-            if (!validBloodGroups.Contains(donor.BloodGroup))
+            if (!BloodGroups.IsValid(donor.BloodGroup))
             {
                 ModelState.AddModelError("BloodGroup", "Invalid blood group.");
             }
@@ -61,9 +151,7 @@ namespace BloodDonation.Controllers
         {
             var existingDonor = dc.Donors.Find(donor.DonorId);
 
-            string[] validBloodGroups = { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
-
-            if (!validBloodGroups.Contains(donor.BloodGroup))
+            if (!BloodGroups.IsValid(donor.BloodGroup))
             {
                 ModelState.AddModelError("BloodGroup", "Invalid blood group.");
             }
@@ -104,54 +192,49 @@ namespace BloodDonation.Controllers
                 return View(existingDonor);
             }
         }
-        [HttpPost]
-        public IActionResult Delete(Donor donor)
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
         {
-            var existingDonor = dc.Donors.Find(donor.DonorId);
-            if (existingDonor == null)
+            try
             {
-                return NotFound();
-            }
-            else
-            {
+                var existingDonor = dc.Donors.Find(id);
+
+                if (existingDonor == null)
+                {
+                    return NotFound();
+                }
+
+                // A donor with donation history cannot be removed: the Donation
+                // foreign key would be orphaned. Explain it instead of failing.
+                int donationCount = dc.Donations.Count(d => d.DonorId == id);
+
+                if (donationCount > 0)
+                {
+                    TempData["Error"] = $"Cannot delete {existingDonor.FullName}. " +
+                        $"This donor has {donationCount} donation record(s). " +
+                        "Delete those donations first.";
+
+                    return RedirectToAction("Read");
+                }
+
                 dc.Donors.Remove(existingDonor);
                 dc.SaveChanges();
+
+                TempData["Success"] = $"Donor {existingDonor.FullName} deleted successfully.";
+
+                return RedirectToAction("Read");
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Unable to delete this donor. It may be referenced by other records.";
                 return RedirectToAction("Read");
             }
         }
         //==================================================================
         [HttpGet]
-        public IActionResult Filter(string bloodGroup)
+        public IActionResult Filter(string? bloodGroup, string? city, int page = 1)
         {
-            
-            List<Donor> donors;
-
-            if (string.IsNullOrEmpty(bloodGroup))
-            {
-                donors = dc.Donors.ToList();
-            }
-            else
-            {
-                donors = dc.Donors
-                           .Where(d => d.BloodGroup == bloodGroup)
-                           .ToList();
-            }
-
-            return View(donors);
-        }
-        [HttpPost]
-        public IActionResult Filter(string bloodGroup, string city)
-        {
-            var donors = dc.Donors.ToList();
-
-            if (!string.IsNullOrEmpty(bloodGroup))
-            {
-                donors = dc.Donors
-                           .Where(d => d.BloodGroup == bloodGroup)
-                           .ToList();
-            }
-
-            return View(donors);
+            return View(BuildDonorList(null, bloodGroup, city, page));
         }
 
         [HttpGet]
